@@ -7,84 +7,14 @@
 <body>
   <h2>Segnala lo stato del mare</h2>
 
-  <form id="reportForm">
-    <label>Località (nome spiaggia):</label><br />
-    <input type="text" id="location" required /><br /><br />
+  <p>
+    Aiutaci a monitorare lo stato del mare in Calabria: clicca sul pulsante qui sotto per inviare una segnalazione (mare pulito, sporco o condizioni particolari). I dati verranno raccolti in forma anonima e contribuiranno a costruire una mappa partecipata e sempre aggiornata.
+  </p>
 
-    <label>Stato del mare:</label><br />
-    <select id="status" required>
-      <option value="">Seleziona</option>
-      <option value="Mare pulito">Mare pulito</option>
-      <option value="Mare mediocre">Mare mediocre</option>
-      <option value="Mare sporco">Mare sporco</option>
-    </select><br /><br />
-
-    <label>Note aggiuntive:</label><br />
-    <textarea id="notes"></textarea><br /><br />
-
-    <label>Link a foto o video (opzionale):</label><br />
-    <input type="url" id="mediaLink" /><br /><br />
-
-    <label>Il tuo nome (opzionale):</label><br />
-    <input type="text" id="reporter" /><br /><br />
-
-    <button type="submit">Invia segnalazione</button>
-  </form>
-
-  <p id="statusMsg"></p>
-
-  <script>
-    const scriptUrl = 'INSERISCI_QUI_L_URL_DEL_TUO_WEB_APP_GOOGLE_APPS_SCRIPT';
-
-    document.getElementById('reportForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-
-      if (!navigator.geolocation) {
-        alert('Geolocalizzazione non supportata dal tuo browser.');
-        return;
-      }
-
-      document.getElementById('statusMsg').textContent = 'Rilevo la posizione...';
-
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        const data = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          location: document.getElementById('location').value,
-          status: document.getElementById('status').value,
-          notes: document.getElementById('notes').value,
-          mediaLink: document.getElementById('mediaLink').value,
-          reporter: document.getElementById('reporter').value
-        };
-
-        document.getElementById('statusMsg').textContent = 'Invio segnalazione...';
-
-        try {
-          const res = await fetch(scriptUrl, {
-            method: 'POST',
-            body: JSON.stringify(data),
-          });
-          const json = await res.json();
-          if (json.result === 'success') {
-            document.getElementById('statusMsg').textContent = 'Segnalazione inviata con successo! Grazie!';
-            document.getElementById('reportForm').reset();
-          } else {
-            document.getElementById('statusMsg').textContent = 'Errore durante l\'invio.';
-          }
-        } catch (err) {
-          document.getElementById('statusMsg').textContent = 'Errore di rete.';
-        }
-
-      }, () => {
-        alert('Permesso di geolocalizzazione negato.');
-        document.getElementById('statusMsg').textContent = '';
-      });
-    });
-  </script>
   <a href="https://docs.google.com/forms/d/e/1FAIpQLSe8kD5MGCye5_XWQPC_s3573Yu3PEZLgQr1VjXoRaVriNx8UA/viewform" target="_blank"
-   style="display: inline-block; padding: 12px 20px; background-color: #008CBA; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
-  🌊 Compila la segnalazione
-</a>
+     style="display: inline-block; padding: 12px 20px; background-color: #008CBA; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+    🌊 Compila la segnalazione
+  </a>
 
 </body>
 </html>
