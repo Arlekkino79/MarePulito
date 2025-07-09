@@ -4,51 +4,84 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Segnala Mare Pulito - Calabria</title>
-  <style>
-    /* Reset base */
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 30px 15px;
-      background: linear-gradient(180deg, #d0f0ff 0%, #ffffff 80%);
-      color: #023e8a;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      box-sizing: border-box;
-    }
+</head>
+<body>
+  <h2>Segnala lo stato del mare</h2>
 
-    h2 {
-      font-size: 2.2rem;
-      margin-bottom: 0.5em;
-      text-align: center;
-      font-weight: 700;
-      text-shadow: 1px 1px 2px #90caf9aa;
-    }
+  <form id="reportForm">
+    <label>Località (nome spiaggia):</label><br />
+    <input type="text" id="location" required /><br /><br />
 
-    p {
-      max-width: 500px;
-      font-size: 1.1rem;
-      text-align: center;
-      margin-bottom: 2.5em;
-      line-height: 1.4;
-      padding: 0 10px;
-    }
+    <label>Stato del mare:</label><br />
+    <select id="status" required>
+      <option value="">Seleziona</option>
+      <option value="Mare pulito">Mare pulito</option>
+      <option value="Mare mediocre">Mare mediocre</option>
+      <option value="Mare sporco">Mare sporco</option>
+    </select><br /><br />
 
-    /* Pulsante grande e accattivante */
-    a.button {
-      background-color: #0077b6;
-      color: white;
-      font-size: 1.6rem;
-      font-weight: 700;
-      padding: 20px 50px;
-      border-radius: 50px;
-      box-shadow: 0 6px 15px rgba(0, 119, 182, 0.4);
-      text-decoration: none;
-      transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
-      user-select: none;
-      display: inline-block;
-      max-width: 100%;
-      text-align: cente
+    <label>Note aggiuntive:</label><br />
+    <textarea id="notes"></textarea><br /><br />
+
+    <label>Link a foto o video (opzionale):</label><br />
+    <input type="url" id="mediaLink" /><br /><br />
+
+    <label>Il tuo nome (opzionale):</label><br />
+    <input type="text" id="reporter" /><br /><br />
+
+    <button type="submit">Invia segnalazione</button>
+  </form>
+
+  <p id="statusMsg"></p>
+
+  <script>
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbzDNY1MAQqqOwmtc3g2lFBwi04kc_4Ic2zhwhPL52IgGok4dgU1Ab34ui18z2tCZXsq/exec';
+
+    document.getElementById('reportForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      if (!navigator.geolocation) {
+        alert('Geolocalizzazione non supportata dal tuo browser.');
+        return;
+      }
+
+      document.getElementById('statusMsg').textContent = 'Rilevo la posizione...';
+
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const data = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          location: document.getElementById('location').value,
+          status: document.getElementById('status').value,
+          notes: document.getElementById('notes').value,
+          mediaLink: document.getElementById('mediaLink').value,
+          reporter: document.getElementById('reporter').value
+        };
+
+        document.getElementById('statusMsg').textContent = 'Invio segnalazione...';
+
+        try {
+          const res = await fetch(scriptUrl, {
+            method: 'POST',
+            body: JSON.stringify(data),
+          });
+          const json = await res.json();
+          if (json.result === 'success') {
+            document.getElementById('statusMsg').textContent = 'Segnalazione inviata con successo! Grazie!';
+            document.getElementById('reportForm').reset();
+          } else {
+            document.getElementById('statusMsg').textContent = 'Errore durante l\'invio.';
+          }
+        } catch (err) {
+          document.getElementById('statusMsg').textContent = 'Errore di rete.';
+        }
+
+      }, () => {
+        alert('Permesso di geolocalizzazione negato.');
+        document.getElementById('statusMsg').textContent = '';
+      });
+    });
+  </script>
+</body>
+</html>
 
